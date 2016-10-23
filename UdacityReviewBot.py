@@ -11,12 +11,13 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 p = None
+APItoken = ''
 
 def start(bot, update):
     logger.info('Received the /start command')
     update.message.reply_text('Hello World!')
-    global p
-    p = subprocess.Popen(['python', 'grading-assigner.py'])
+    global p, APItoken
+    p = subprocess.Popen(['python', 'grading-assigner.py', '-T'+ APItoken])
 
 def hello(bot, update):
     logger.info('Received the /hello command')
@@ -35,7 +36,12 @@ def any(bot, update):
     logger.info('Received something strange') # TODO: add information about command received
 
 try:
-    token = open('UdacityReview_bot.token').readline()
+    lines = []
+    for line in open('UdacityReview_bot.token').readlines():
+        lines.append(line)
+    token = lines[0].strip('\n')
+    assert token == '295304941:AAG5mq8hklWjlHfkWF6_wvj5eH27xrOzhh0'
+    APItoken = lines[1].strip('\n')
 except:
     logger.critical('Unable to open token file')
     raise 'Unable to open token file!'

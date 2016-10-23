@@ -121,7 +121,7 @@ def request_reviews(token):
     current_request = me_req_resp.json()[0] if me_req_resp.status_code == 200 and len(me_req_resp.json()) > 0 else None
 
     if current_request:
-        logger.info('Current request: ' + current_request['id'])
+        logger.info('Current request: ' + str(current_request['id']))
         update_resp = requests.put(PUT_REQUEST_URL_TMPL.format(BASE_URL, current_request['id']),
                                    json={'projects': project_language_pairs}, headers=headers)
         current_request = update_resp.json() if update_resp.status_code == 200 else current_request
@@ -181,9 +181,8 @@ if __name__ == "__main__":
     args = cmd_parser.parse_args()
 
     if not args.token:
-        args.token = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyX2lkIjo0MDY5LCJleHAiOjE0Nzc2NTcwNjksInRva2VuX3R5cGUiOiJhcGkifQ.LX0XQcg7VhEQBUxnvJ0x64ak7oktKaOPnPw2RXiC3T0'
-        # cmd_parser.print_help()
-        # cmd_parser.exit()
+        cmd_parser.print_help()
+        cmd_parser.exit()
 
     if args.debug:
         logger.setLevel(logging.DEBUG)
