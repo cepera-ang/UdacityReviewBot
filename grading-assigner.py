@@ -118,7 +118,7 @@ def request_reviews(token):
     else:
         logger.info('No requests')
 
-    current_request = me_req_resp.json()[0] if me_req_resp.status_code == 201 and len(me_req_resp.json()) > 0 else None
+    current_request = me_req_resp.json()[0] if me_req_resp.status_code == 200 and len(me_req_resp.json()) > 0 else None
 
     if current_request:
         logger.info('Current request: ' + current_request['id'])
