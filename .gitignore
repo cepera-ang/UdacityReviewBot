@@ -1,0 +1,10 @@
+UdacityReview_bot.token
+old-poller/telegram-bot.py
+old-poller/status.txt
+old-poller/README.md
+old-poller/requirements.txt
+*.xml
+.idea/UdacityReviewBot.iml
+.ipynb_checkpoints/TestUdacityAPI-checkpoint.ipynb
+old-poller/grading-assigner.py
+TestUdacityAPI.ipynb
