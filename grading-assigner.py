@@ -163,7 +163,7 @@ def request_reviews(token):
             # Wait 2 minutes before next check to see if the request has been fulfilled
             queue = requests.get(WAIT_REQUEST_URL.format(BASE_URL, current_request['id']), headers=headers)
             logger.info('Current request ID ' + str(current_request['id']))
-            logger.info('Queue befor me: ' + str(queue.json()))
+            logger.info('Queue before me: ' + str(queue.json()))
             time.sleep(120.0)
 
 if __name__ == "__main__":
