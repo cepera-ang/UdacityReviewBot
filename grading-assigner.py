@@ -120,11 +120,11 @@ def request_reviews(token):
 
     current_request = me_req_resp.json()[0] if me_req_resp.status_code == 200 and len(me_req_resp.json()) > 0 else None
 
-    if current_request:
-        logger.info('Current request: ' + str(current_request['id']))
-        update_resp = requests.put(PUT_REQUEST_URL_TMPL.format(BASE_URL, current_request['id']),
-                                   json={'projects': project_language_pairs}, headers=headers)
-        current_request = update_resp.json() if update_resp.status_code == 200 else current_request
+    # if current_request:
+    #     logger.info('Current request: ' + str(current_request['id']))
+    #     update_resp = requests.put(PUT_REQUEST_URL_TMPL.format(BASE_URL, current_request['id']),
+    #                                json={'projects': project_language_pairs}, headers=headers)
+    #     current_request = update_resp.json() if update_resp.status_code == 200 else current_request
 
     while True:
         # Loop and wait until fewer than 2 reviews assigned, as creating
