@@ -10,7 +10,7 @@ It will have the following functionality (work in progress):
 #Usage
 
 - Register you bot in Telegram [here]() and receive bot token.
-- Create `UdacityReview_bot.token' file and paste your token.
+- Create `UdacityReview_bot.token' file and paste your bot and reviewer API tokens each on separate lines.
 - Run UdacityReviewBot.py
 `python3 UdacityReviewBot.py`
 - Add bot to your Telegram contacts and `/start`
