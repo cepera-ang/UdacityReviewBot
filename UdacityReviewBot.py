@@ -24,10 +24,12 @@ def hello(bot, update):
         'Hello {}'.format(update.message.from_user.first_name))
 
 def stop(bot, update):
-    logger.info('Received the /stop command')
-    update.message.reply_text('Stopping the grader script')
     global p
+    logger.info('Received the /stop command, PID:' + str(p.pid))
+    update.message.reply_text('Stopping the grader script, PID:' + str(p.pid))
     p.terminate()
+    logger.info('Killed PID:' + str(p.pid))
+    update.message.reply_text('Stopped the grader script')
 
 def any(bot, update):
     logger.info('Received something strange') # TODO: add information about command received
