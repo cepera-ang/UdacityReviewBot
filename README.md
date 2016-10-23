@@ -2,10 +2,10 @@
 This Telegram bot utilizes Udacity Review API to fetch new submissions for review.
 It will query Udacity servers using latest API version and notify in Telegram when new submission available.
 It will have the following functionality (work in progress):
-- Quering Udacity servers given your Reviewer token
-- You may select which of the projects you certified for review to assign automatically
-- Quering can be paused for given period of time
-- Anything else?
+- [x] Quering Udacity servers given your Reviewer token
+- [ ] You may select which of the projects you certified for review to assign automatically
+- [ ] Quering can be paused for given period of time
+- [ ] Anything else?
 
 #Usage
 
