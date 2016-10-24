@@ -92,8 +92,9 @@ def fetch_certified_pairs():
     certs_resp.raise_for_status()
 
     certs = certs_resp.json()
-    project_ids = [cert['project']['id'] for cert in certs if cert['status'] == 'certified']
-
+    # FIXME: Hardcoded project id to review, fix to allow selection from command line
+    # project_ids = [cert['project']['id'] for cert in certs if cert['status'] == 'certified']
+    project_ids = [28]
     logger.info("Found certifications for project IDs: %s in languages %s",
                 str(project_ids), str(languages))
     logger.info("Polling for new submissions...")
