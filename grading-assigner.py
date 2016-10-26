@@ -62,11 +62,14 @@ def alert_for_assignment(current_request, headers):
 
 def wait_for_assign_eligible():
     while True:
-        assigned_resp = requests.get(ASSIGNED_COUNT_URL, headers=headers)
-        if assigned_resp.status_code == 404 or assigned_resp.json()['assigned_count'] < 2:
-            break
-        else:
-            logger.info('Waiting for assigned submissions < 2')
+        try:
+            assigned_resp = requests.get(ASSIGNED_COUNT_URL, headers=headers)
+            if assigned_resp.status_code == 404 or assigned_resp.json()['assigned_count'] < 2:
+                break
+            else:
+                logger.info('Waiting for assigned submissions < 2')
+        except:
+            pass
         # Wait 30 seconds before checking to see if < 2 open submissions
         # that is, waiting until a create submission request will be permitted
         time.sleep(30.0)
