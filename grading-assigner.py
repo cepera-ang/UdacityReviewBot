@@ -40,7 +40,7 @@ def signal_handler(signal, frame):
     if headers:
         logger.info('Cleaning up active request')
         me_resp = requests.get(ME_REQUEST_URL, headers=headers)
-        if me_resp.status_code == 200 and len(me_resp.json()) > 0:
+        if me_resp.status_code == 200 and len(me_resp.content) > 0:
             logger.info(DELETE_URL_TMPL.format(BASE_URL, me_resp.json()[0]['id']))
             del_resp = requests.delete(DELETE_URL_TMPL.format(BASE_URL, me_resp.json()[0]['id']),
                                        headers=headers)
@@ -69,6 +69,7 @@ def wait_for_assign_eligible():
             else:
                 logger.info('Waiting for assigned submissions < 2')
         except:
+            logger.info('There was an error with decoding JSON request')
             pass
         # Wait 30 seconds before checking to see if < 2 open submissions
         # that is, waiting until a create submission request will be permitted
@@ -82,8 +83,10 @@ def refresh_request(current_request):
     if refresh_resp.status_code == 404:
         logger.info('No active request was found/refreshed.  Loop and either wait for < 2 to be assigned or immediately create')
         return None
-    else:
+    elif len(refresh_resp.content) > 0:
         return refresh_resp.json()
+    else:
+        return None
 
 def fetch_certified_pairs():
     logger.info("Requesting certifications...")
@@ -93,7 +96,8 @@ def fetch_certified_pairs():
 
     certs_resp = requests.get(CERTS_URL, headers=headers)
     certs_resp.raise_for_status()
-
+    # It could crash if there was no json for some reason, but as we launch this code
+    # once at the start of the script we can spot this and rerun immediately
     certs = certs_resp.json()
     # FIXME: Hardcoded project id to review, fix to allow selection from command line
     # project_ids = [cert['project']['id'] for cert in certs if cert['status'] == 'certified']
@@ -113,16 +117,17 @@ def request_reviews(token):
 
     me_req_resp = requests.get(ME_REQUEST_URL, headers=headers)
     logger.info(me_req_resp.status_code)
-    logger.info(me_req_resp.json() if len(me_req_resp.json()) > 0 else '')
+    # There was logging of json content, now it is just logging whatever answer is
+    logger.info(me_req_resp.content)
     # If there is any answer except empty, it means we have active submission and should cancel it first
-    if me_req_resp.json():
+    if len(me_req_resp.content) > 0:
         del_resp = requests.delete(DELETE_URL_TMPL.format(BASE_URL, me_req_resp.json()[0]['id']),
                                    headers=headers)
         logger.info('Successful deletion ' + del_resp.text)
     else:
         logger.info('No requests')
 
-    current_request = me_req_resp.json()[0] if me_req_resp.status_code == 200 and len(me_req_resp.json()) > 0 else None
+    current_request = me_req_resp.json()[0] if me_req_resp.status_code == 200 and len(me_req_resp.content) > 0 else None
 
     # if current_request:
     #     logger.info('Current request: ' + str(current_request['id']))
@@ -141,7 +146,7 @@ def request_reviews(token):
             create_resp = requests.post(CREATE_REQUEST_URL,
                                         json={'projects': project_language_pairs},
                                         headers=headers)
-            current_request = create_resp.json() if create_resp.status_code == 201 else None
+            current_request = create_resp.json() if create_resp.status_code == 201 and len(create_resp.content) else None
         else:
             closing_at = parser.parse(current_request['closed_at'])
 
@@ -166,9 +171,10 @@ def request_reviews(token):
         if current_request:
             # Wait 2 minutes before next check to see if the request has been fulfilled
             queue = requests.get(WAIT_REQUEST_URL.format(BASE_URL, current_request['id']), headers=headers)
-            logger.info('Current request ID ' + str(current_request['id']))
-            logger.info('Queue before me: ' + str(queue.json()))
-            time.sleep(120.0)
+            if queue.status_code == 201 and len(queue.content) > 0:
+                logger.info('Current request ID ' + str(current_request['id']))
+                logger.info('Queue before me: ' + str(queue.json()))
+                time.sleep(120.0)
 
 if __name__ == "__main__":
     cmd_parser = argparse.ArgumentParser(description =
