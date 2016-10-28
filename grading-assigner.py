@@ -40,7 +40,7 @@ def signal_handler(signal, frame):
     if headers:
         logger.info('Cleaning up active request')
         me_resp = requests.get(ME_REQUEST_URL, headers=headers)
-        if me_resp.status_code == 200 and len(me_resp.content) > 0:
+        if me_resp.status_code == 200 and len(me_resp.content) > 3:
             logger.info(DELETE_URL_TMPL.format(BASE_URL, me_resp.json()[0]['id']))
             del_resp = requests.delete(DELETE_URL_TMPL.format(BASE_URL, me_resp.json()[0]['id']),
                                        headers=headers)
@@ -83,7 +83,7 @@ def refresh_request(current_request):
     if refresh_resp.status_code == 404:
         logger.info('No active request was found/refreshed.  Loop and either wait for < 2 to be assigned or immediately create')
         return None
-    elif len(refresh_resp.content) > 0:
+    elif len(refresh_resp.content) > 3:
         return refresh_resp.json()
     else:
         return None
@@ -120,14 +120,14 @@ def request_reviews(token):
     # There was logging of json content, now it is just logging whatever answer is
     logger.info(me_req_resp.content)
     # If there is any answer except empty, it means we have active submission and should cancel it first
-    if len(me_req_resp.content) > 0:
+    if len(me_req_resp.content) > 3:
         del_resp = requests.delete(DELETE_URL_TMPL.format(BASE_URL, me_req_resp.json()[0]['id']),
                                    headers=headers)
         logger.info('Successful deletion ' + del_resp.text)
     else:
         logger.info('No requests')
 
-    current_request = me_req_resp.json()[0] if me_req_resp.status_code == 200 and len(me_req_resp.content) > 0 else None
+    current_request = me_req_resp.json()[0] if me_req_resp.status_code == 200 and len(me_req_resp.content) > 3 else None
 
     # if current_request:
     #     logger.info('Current request: ' + str(current_request['id']))
@@ -146,7 +146,7 @@ def request_reviews(token):
             create_resp = requests.post(CREATE_REQUEST_URL,
                                         json={'projects': project_language_pairs},
                                         headers=headers)
-            current_request = create_resp.json() if create_resp.status_code == 201 and len(create_resp.content) else None
+            current_request = create_resp.json() if create_resp.status_code == 201 and len(create_resp.content) > 3 else None
         else:
             closing_at = parser.parse(current_request['closed_at'])
 
@@ -171,7 +171,8 @@ def request_reviews(token):
         if current_request:
             # Wait 2 minutes before next check to see if the request has been fulfilled
             queue = requests.get(WAIT_REQUEST_URL.format(BASE_URL, current_request['id']), headers=headers)
-            if queue.status_code == 201 and len(queue.content) > 0:
+            logger.info(str(queue.content) + ' ' + str(queue.status_code))
+            if queue.status_code == 200 and len(queue.content) > 3:
                 logger.info('Current request ID ' + str(current_request['id']))
                 logger.info('Queue before me: ' + str(queue.json()))
                 time.sleep(120.0)
