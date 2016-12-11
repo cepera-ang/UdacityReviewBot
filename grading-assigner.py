@@ -92,13 +92,14 @@ def fetch_certified_pairs():
     logger.info("Requesting certifications...")
     me_resp = requests.get(ME_URL, headers=headers)
     me_resp.raise_for_status()
-    languages = me_resp.json()['application']['languages'] or ['en-us']
+    # languages = me_resp.json()['application']['languages'] or ['en-us']
+    languages = ['en-us']
 
     certs_resp = requests.get(CERTS_URL, headers=headers)
     certs_resp.raise_for_status()
     # It could crash if there was no json for some reason, but as we launch this code
     # once at the start of the script we can spot this and rerun immediately
-    certs = certs_resp.json()
+    # certs = certs_resp.json()
     # FIXME: Hardcoded project id to review, fix to allow selection from command line
     # project_ids = [cert['project']['id'] for cert in certs if cert['status'] == 'certified']
     project_ids = [28]
@@ -165,7 +166,10 @@ def request_reviews(token):
                 # the request record will no longer be 'fulfilled'
                 url = GET_REQUEST_URL_TMPL.format(BASE_URL, current_request['id'])
                 get_req_resp = requests.get(url, headers=headers)
-                current_request = get_req_resp.json() if me_req_resp.status_code == 200 else None
+                try:
+                    current_request = get_req_resp.json() if me_req_resp.status_code == 200 else None
+                except:
+                    logger.info('There was an error decoding JSON in checking new assignments')
 
         current_request = alert_for_assignment(current_request, headers)
         if current_request:
