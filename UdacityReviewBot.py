@@ -17,7 +17,7 @@ def start(bot, update):
     logger.info('Received the /start command')
     update.message.reply_text('Hello World!')
     global p, APItoken
-    p = subprocess.Popen(['python', 'grading-assigner.py', '-T'+ APItoken])
+    p = subprocess.Popen(['python3', 'grading-assigner.py', '-T'+ APItoken])
 
 def hello(bot, update):
     logger.info('Received the /hello command')
